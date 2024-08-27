@@ -1,9 +1,0 @@
-bazel_dep(
-    name = "buildifier_prebuilt",
-    version = "7.1.2",
-    dev_dependency = True,
-)
-
-register_toolchains(
-    "//toolchain:gcc",
-)
