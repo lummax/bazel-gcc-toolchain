@@ -78,15 +78,52 @@ bootlin_toolchain = repository_rule(
     },
 )
 
+def _filter_versions_for_aliases():
+    by_version = dict()
+    for data in VERSIONS:
+        name = data["name"]
+        if "glibc" in name:
+            version = data["version"]
+            if version not in by_version:
+                by_version[version] = []
+            by_version[version].append(name)
+
+    selection = []
+    for (version, values) in by_version.items():
+        most_recent = sorted(values, reverse = True)[0]
+        selection.append((version, most_recent))
+
+    return selection
+
+def _bootlin_toolchains_impl(ctx):
+    aliases = [
+        'alias(name="gcc_{}_toolchain", actual="@{}-{}//:cc_toolchain")'.format(
+            version,
+            ctx.attr.name,
+            name,
+        )
+        for (version, name) in _filter_versions_for_aliases()
+    ]
+
+    ctx.file(
+        "BUILD.bazel",
+        'package(default_visibility = ["//visibility:public"])\n' + "\n".join(aliases),
+    )
+
+_bootlin_toolchains = repository_rule(
+    implementation = _bootlin_toolchains_impl,
+)
+
 def bootlin_toolchains(
-        prefix,
+        name,
         compile_flags = None,
         cxx_flags = None,
         dbg_compile_flags = None,
         opt_compile_flags = None):
+    _bootlin_toolchains(name = name)
     for data in VERSIONS:
         kwargs = dict(**data)
-        kwargs["name"] = "{}-{}".format(prefix, kwargs["name"])
+        kwargs["name"] = "{}-{}".format(name, kwargs["name"])
         bootlin_toolchain(
             compile_flags = compile_flags,
             cxx_flags = cxx_flags,

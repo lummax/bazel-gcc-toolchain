@@ -24,7 +24,7 @@ buildifier_prebuilt_register_toolchains()
 load("//toolchain:defs.bzl", "bootlin_toolchains")
 
 bootlin_toolchains(
-    "gcc_toolchain",
+    name = "gcc_toolchain",
     cxx_flags = ["-std=c++17"],
 )
 

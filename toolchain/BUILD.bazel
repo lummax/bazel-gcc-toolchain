@@ -8,6 +8,6 @@ toolchain(
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
     ],
-    toolchain = "@gcc_toolchain-13.3.0-x86-64--glibc--stable-2024.05-1//:cc_toolchain",
+    toolchain = "@gcc_toolchain//:gcc_13.3.0_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
