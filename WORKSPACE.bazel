@@ -21,16 +21,9 @@ load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains
 
 buildifier_prebuilt_register_toolchains()
 
-load("//toolchain:defs.bzl", "bootlin_toolchain")
+load("//:defs.bzl", "bootlin_toolchains")
 
-bootlin_toolchain(
-    name = "gcc_toolchain",
-    arch = "x86-64",
-    build_file = "//toolchain/gcc:BUILD.tmpl.bazel",
-    integrity = "sha256-kygjypo+Bn5+KimBCmZtIMnMW7VQ3pR/aHnjis4aqVU=",
-    variant = "x86-64--glibc--stable-2024.05-1",
-    version = "13.3.0",
-)
+bootlin_toolchains()
 
 register_toolchains(
     "//toolchain:gcc",

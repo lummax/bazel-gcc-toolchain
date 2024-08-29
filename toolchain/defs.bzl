@@ -1,11 +1,11 @@
 def _bootlin_toolchain_impl(ctx):
     ctx.download_and_extract(
-        url = "{base}/{arch}/tarballs/{variant}.tar.xz".format(
+        url = "{base}/{arch}/tarballs/{filename}".format(
             base = ctx.attr.url_base,
             arch = ctx.attr.arch,
-            variant = ctx.attr.variant,
+            filename = ctx.attr.filename,
         ),
-        integrity = ctx.attr.integrity,
+        sha256 = ctx.attr.sha256,
         stripPrefix = ctx.attr.variant,
     )
     substitutions = {
@@ -34,7 +34,8 @@ bootlin_toolchain = repository_rule(
         "arch": attr.string(mandatory = True),
         "variant": attr.string(mandatory = True),
         "version": attr.string(mandatory = True),
-        "integrity": attr.string(mandatory = True),
+        "sha256": attr.string(mandatory = True),
+        "filename": attr.string(mandatory = True),
         "build_file": attr.label(default = "//toolchain/gcc:BUILD.tmpl.bazel"),
         "wrapper": attr.label(default = "//toolchain/gcc:wrapper.sh"),
     },
