@@ -35,13 +35,7 @@ cc_toolchain_config(
     abi_libc_version = "local",
     abi_version = "local",
     builtin_sysroot = "external/@@REPOSITORY@@/x86_64-buildroot-linux-gnu/sysroot",
-    compile_flags = [
-        "-fstack-protector",
-        "-Wall",
-        "-Wunused-but-set-parameter",
-        "-Wno-free-nonheap-object",
-        "-fno-omit-frame-pointer",
-    ],
+    compile_flags = [],  # REPLACE
     compiler = "gcc",
     conly_flags = [],
     coverage_compile_flags = ["--coverage"],
@@ -56,8 +50,8 @@ cc_toolchain_config(
         "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include/c++/@@VERSION@@/x86_64-buildroot-linux-gnu",
         "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include/c++/@@VERSION@@/backward",
     ],
-    cxx_flags = ["-std=c++14"],
-    dbg_compile_flags = ["-g"],
+    cxx_flags = [],  # REPLACE
+    dbg_compile_flags = [],  # REPLACE
     extra_flags_per_feature = {},
     host_system_name = "local",
     link_flags = [
@@ -75,14 +69,7 @@ cc_toolchain_config(
         "-lm",
         "-Wl,--pop-state",
     ],
-    opt_compile_flags = [
-        "-g0",
-        "-O2",
-        "-D_FORTIFY_SOURCE=1",
-        "-DNDEBUG",
-        "-ffunction-sections",
-        "-fdata-sections",
-    ],
+    opt_compile_flags = [],  # REPLACE
     opt_link_flags = ["-Wl,--gc-sections"],
     supports_start_end_lib = True,
     target_libc = "local",
