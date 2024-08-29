@@ -29,5 +29,5 @@ bootlin_toolchains(
 )
 
 register_toolchains(
-    "//toolchain:gcc",
+    "@gcc_toolchain//:gcc_13.3.0_toolchain",
 )

@@ -96,18 +96,43 @@ def _filter_versions_for_aliases():
     return selection
 
 def _bootlin_toolchains_impl(ctx):
-    aliases = [
-        'alias(name="gcc_{}_toolchain", actual="@{}-{}//:cc_toolchain")'.format(
+    toolchain_template = """
+toolchain(
+    name = "gcc_{version}_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":gcc_{version}_cc_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)"""
+
+    versions_for_aliases = _filter_versions_for_aliases()
+    cc_aliases = [
+        'alias(name="gcc_{}_cc_toolchain", actual="@{}-{}//:cc_toolchain")'.format(
             version,
             ctx.attr.name,
             name,
         )
-        for (version, name) in _filter_versions_for_aliases()
+        for (version, name) in versions_for_aliases
+    ]
+
+    toolchains = [
+        toolchain_template.format(version = version)
+        for (version, name) in versions_for_aliases
     ]
 
     ctx.file(
         "BUILD.bazel",
-        'package(default_visibility = ["//visibility:public"])\n' + "\n".join(aliases),
+        (
+            'package(default_visibility = ["//visibility:public"])\n' +
+            "\n".join(cc_aliases) +
+            "\n".join(toolchains)
+        ),
     )
 
 _bootlin_toolchains = repository_rule(
