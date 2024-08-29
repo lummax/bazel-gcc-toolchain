@@ -1,3 +1,13 @@
+# Experiments with Bazel GCC compilation toolchains
+
+This repository is some experimentation with using `gcc` compiler toolchains
+provided by https://toolchains.bootlin.com/ in `bazel`.
+
+- All `x86_64` toolchains bootlin provides are available. Run `bazel query
+  '//external:*' | grep gcc_toolchain` for the full list.
+- Additionally some convenience aliases are defined. See `bazel query
+  '@gcc_toolchain//...'`.
+
 ## Chosen Toolchain
 
 - https://toolchains.bootlin.com/
