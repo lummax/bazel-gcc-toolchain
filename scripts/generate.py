@@ -79,7 +79,7 @@ def main():
         print(
             f"""
     bootlin_toolchain(
-        name = "gcc_toolchain-{toolchain.variant}",
+        name = "gcc_toolchain-{toolchain.version}-{toolchain.variant}",
         arch = "{toolchain.arch}",
         build_file = "//toolchain/gcc:BUILD.tmpl.bazel",
         sha256 = "{toolchain.integrity}",
