@@ -77,7 +77,7 @@ cc_toolchain_config(
     target_libc = "local",
     target_system_name = "x86_64-linux",
     tool_paths = {
-        "ar": "bin/x86_64-linux-gccbin/x86_64-linux-ar",
+        "ar": "bin/x86_64-linux-ar",
         "ld": "bin/x86_64-linux-ld",
         "llvm-cov": "None",
         "llvm-profdata": "None",

@@ -1,4 +1,4 @@
-load("//toolchain:versions.bzl", "VERSIONS")
+load(":versions.bzl", "VERSIONS")
 
 def _bootlin_toolchain_impl(ctx):
     ctx.download_and_extract(
@@ -52,8 +52,8 @@ bootlin_toolchain = repository_rule(
         "version": attr.string(mandatory = True),
         "sha256": attr.string(mandatory = True),
         "filename": attr.string(mandatory = True),
-        "build_file": attr.label(default = "//toolchain/gcc:BUILD.tmpl.bazel"),
-        "wrapper": attr.label(default = "//toolchain/gcc:wrapper.sh"),
+        "build_file": attr.label(default = ":BUILD.tmpl.bazel"),
+        "wrapper": attr.label(default = ":wrapper.sh"),
         "compile_flags": attr.string_list(
             default = [
                 "-fstack-protector",

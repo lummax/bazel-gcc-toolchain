@@ -21,7 +21,7 @@ load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains
 
 buildifier_prebuilt_register_toolchains()
 
-load("//toolchain:defs.bzl", "bootlin_toolchains")
+load("//toolchain/bootlin_gcc:defs.bzl", "bootlin_toolchains")
 
 bootlin_toolchains(
     name = "gcc_toolchain",
