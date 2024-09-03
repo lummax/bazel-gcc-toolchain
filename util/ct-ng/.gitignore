@@ -1,0 +1,6 @@
+include/
+build.log
+.build/
+x-tools/
+.config.old
+*.tar.*

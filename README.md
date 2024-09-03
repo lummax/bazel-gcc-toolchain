@@ -1,14 +1,40 @@
 # Experiments with Bazel GCC compilation toolchains
 
-This repository is some experimentation with using `gcc` compiler toolchains
-provided by https://toolchains.bootlin.com/ in `bazel`.
+This repository is some experimentation with using different `gcc` compiler
+toolchains.
+
+## Predefined Toolchains
+
+This repository configures toolchains provided by
+https://toolchains.bootlin.com/ in `bazel`.
 
 - All `x86_64` toolchains bootlin provides are available. Run `bazel query
   '//external:*' | grep gcc_toolchain` for the full list.
 - Additionally some convenience aliases are defined. See `bazel query
   'kind(toolchain, @gcc_toolchain//...)'`.
 
-## Chosen Toolchain
+## Custom Toolchains
+
+In case the bootlin toolchains are not sufficient you can build your own using
+https://crosstool-ng.github.io/. See `util/ct-ng/README.md` for some help on
+that.
+
+```
+load("//toolchain/crosstoolNG_gcc:defs.bzl", "crosstoolNG_toolchain")
+
+crosstoolNG_toolchain(
+    name = "gcc_toolchain",
+    cxx_flags = ["-std=c++14"],
+    sha256 = "...",
+    url = "http://.../x86_64-unknown-linux-gnu.tar.bz2",
+    variant = "x86_64-unknown-linux-gnu",
+    version = "9.5.0",
+)
+```
+
+## Background Info
+
+### Chosen Toolchain
 
 - https://toolchains.bootlin.com/
     - Provides a wide variation of GCC toolchains
@@ -16,12 +42,14 @@ provided by https://toolchains.bootlin.com/ in `bazel`.
     versions of GCC. But might limit the glibc
     compatiblitily to something new-ish.
 
-## Alternative GCC Distributions
+### Alternative GCC Distributions
 
 - https://buildroot.org/ or https://crosstool-ng.github.io/
     - This requires to build the distribution and store
     the resulting artifacts somewhere. But it gives greater
     control over the used gcc/glibc/other tool versions.
+    - Here crosstool-NG (and not buildroot) was chosen for the reasons outlined
+      in https://crosstool-ng.github.io/docs/introduction/.
 - https://github.com/xpack-dev-tools/gcc-xpack/
 
 ## Related Bazel Toolchains
