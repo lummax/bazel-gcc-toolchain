@@ -19,7 +19,7 @@
 # `cxx_builtin_include_directories` obsolete/for documentation purposes.
 
 dotd="$(echo "$@" | grep -o "\-MF [^ ]*.d" | cut -d' ' -f2)"
-./external/@@REPOSITORY@@/bin/x86_64-linux-gcc "$@"
+./external/__REPOSITORY__/bin/x86_64-linux-gcc "$@"
 ret=$?
 if [[ -n "${dotd}" ]] then
   sed -i "s:$(realpath $(pwd))/::" "${dotd}" 

@@ -1,0 +1,19 @@
+bazel_dep(
+    name = "buildifier_prebuilt",
+    version = "7.3.1",
+    dev_dependency = True,
+)
+
+bootlin_toolchains = use_extension(
+    "//toolchain/bootlin_gcc:extension.bzl",
+    "bootlin_toolchains_extension",
+)
+bootlin_toolchains.configure(
+    name = "gcc_toolchain",
+    cxx_flags = ["-std=c++17"],
+)
+use_repo(bootlin_toolchains, "gcc_toolchain")
+
+register_toolchains(
+    "@gcc_toolchain//:gcc_13.3.0_toolchain",
+)

@@ -20,15 +20,22 @@ https://crosstool-ng.github.io/. See `util/ct-ng/README.md` for some help on
 that.
 
 ```
-load("//toolchain/crosstoolNG_gcc:defs.bzl", "crosstoolNG_toolchain")
-
-crosstoolNG_toolchain(
+crosstoolNG_toolchain = use_extension(
+    "//toolchain/crosstoolNG_gcc:extension.bzl",
+    "crosstoolNG_toolchain_extension",
+)
+crosstoolNG_toolchain.configure(
     name = "gcc_toolchain",
     cxx_flags = ["-std=c++14"],
     sha256 = "...",
     url = "http://.../x86_64-unknown-linux-gnu.tar.bz2",
     variant = "x86_64-unknown-linux-gnu",
     version = "9.5.0",
+)
+use_repo(crosstoolNG_toolchain, "gcc_toolchain")
+
+register_toolchains(
+    "@gcc_toolchain//:gcc_toolchain",
 )
 ```
 

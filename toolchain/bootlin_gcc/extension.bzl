@@ -11,10 +11,10 @@ def _bootlin_toolchain_impl(ctx):
         stripPrefix = ctx.attr.variant,
     )
     substitutions = {
-        "@@ARCH@@": ctx.attr.arch,
-        "@@REPOSITORY@@": ctx.attr.name,
-        "@@VARIANT@@": ctx.attr.variant,
-        "@@VERSION@@": ctx.attr.version,
+        "__ARCH__": ctx.attr.arch,
+        "__REPOSITORY__": ctx.attr.name,
+        "__VARIANT__": ctx.attr.variant,
+        "__VERSION__": ctx.attr.version,
     } | {
         # This is a little weird as replacements go, but this
         # ensures the BUILD.tmpl.bazel is still valid and can
@@ -100,12 +100,12 @@ def _bootlin_toolchains_impl(ctx):
 toolchain(
     name = "gcc_{version}_toolchain",
     exec_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
+        "@@platforms//os:linux",
+        "@@platforms//cpu:x86_64",
     ],
     target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
+        "@@platforms//os:linux",
+        "@@platforms//cpu:x86_64",
     ],
     toolchain = ":gcc_{version}_cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
@@ -113,7 +113,7 @@ toolchain(
 
     versions_for_aliases = _filter_versions_for_aliases()
     cc_aliases = [
-        'alias(name="gcc_{}_cc_toolchain", actual="@{}-{}//:cc_toolchain")'.format(
+        'alias(name="gcc_{}_cc_toolchain", actual="@@{}-{}//:cc_toolchain")'.format(
             version,
             ctx.attr.name,
             name,
@@ -139,20 +139,41 @@ _bootlin_toolchains = repository_rule(
     implementation = _bootlin_toolchains_impl,
 )
 
-def bootlin_toolchains(
-        name,
-        compile_flags = None,
-        cxx_flags = None,
-        dbg_compile_flags = None,
-        opt_compile_flags = None):
-    _bootlin_toolchains(name = name)
-    for data in VERSIONS:
-        kwargs = dict(**data)
-        kwargs["name"] = "{}-{}".format(name, kwargs["name"])
-        bootlin_toolchain(
-            compile_flags = compile_flags,
-            cxx_flags = cxx_flags,
-            dbg_compile_flags = dbg_compile_flags,
-            opt_compile_flags = opt_compile_flags,
-            **kwargs
-        )
+DEFAULT_NAME = "gcc_toolchain"
+
+configure = tag_class(
+    attrs = {
+        "name": attr.string(default = DEFAULT_NAME),
+        "compile_flags": attr.string_list(),
+        "cxx_flags": attr.string_list(),
+        "dbg_compile_flags": attr.string_list(),
+        "opt_compile_flags": attr.string_list(),
+    },
+)
+
+def _or_none(value):
+    if value:
+        return value
+    return None
+
+def _bootlin_toolchains_extension_impl(ctx):
+    for mod in ctx.modules:
+        for conf in mod.tags.configure:
+            for data in VERSIONS:
+                kwargs = dict(**data)
+                kwargs["name"] = "{}-{}".format(conf.name, kwargs["name"])
+                bootlin_toolchain(
+                    # we use `_or_none()` to get the repository_rule default
+                    # values if no explicit values are given in the `configure` tag.
+                    compile_flags = _or_none(conf.compile_flags),
+                    cxx_flags = _or_none(conf.cxx_flags),
+                    dbg_compile_flags = _or_none(conf.dbg_compile_flags),
+                    opt_compile_flags = _or_none(conf.opt_compile_flags),
+                    **kwargs
+                )
+            _bootlin_toolchains(name = conf.name)
+
+bootlin_toolchains_extension = module_extension(
+    implementation = _bootlin_toolchains_extension_impl,
+    tag_classes = {"configure": configure},
+)

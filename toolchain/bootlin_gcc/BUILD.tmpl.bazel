@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
-load("@rules_cc//cc:defs.bzl", "cc_toolchain", "cc_toolchain_suite")
+load("@@rules_cc//cc:defs.bzl", "cc_toolchain", "cc_toolchain_suite")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,29 +28,29 @@ cc_toolchain(
     strip_files = ":empty",
     supports_header_parsing = 1,
     supports_param_files = 1,
-    toolchain_config = "gcc-@@VARIANT@@-config",
-    toolchain_identifier = "gcc-@@VARIANT@@",
+    toolchain_config = "gcc-__VARIANT__-config",
+    toolchain_identifier = "gcc-__VARIANT__",
 )
 
 cc_toolchain_config(
-    name = "gcc-@@VARIANT@@-config",
+    name = "gcc-__VARIANT__-config",
     abi_libc_version = "local",
     abi_version = "local",
-    builtin_sysroot = "external/@@REPOSITORY@@/x86_64-buildroot-linux-gnu/sysroot",
+    builtin_sysroot = "external/__REPOSITORY__/x86_64-buildroot-linux-gnu/sysroot",
     compile_flags = [],  # REPLACE
     compiler = "gcc",
     conly_flags = [],
     coverage_compile_flags = ["--coverage"],
     coverage_link_flags = ["--coverage"],
-    cpu = "@@ARCH@@",
+    cpu = "__ARCH__",
     cxx_builtin_include_directories = [
-        "%package(@@@REPOSITORY@@//)%/lib/gcc/x86_64-buildroot-linux-gnu/@@VERSION@@/include",
-        "%package(@@@REPOSITORY@@//)%/lib/gcc/x86_64-buildroot-linux-gnu/@@VERSION@@/include-fixed",
-        "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include",
-        "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/sysroot/usr/include",
-        "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include/c++/@@VERSION@@",
-        "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include/c++/@@VERSION@@/x86_64-buildroot-linux-gnu",
-        "%package(@@@REPOSITORY@@//)%/x86_64-buildroot-linux-gnu/include/c++/@@VERSION@@/backward",
+        "%package(@@__REPOSITORY__//)%/lib/gcc/x86_64-buildroot-linux-gnu/__VERSION__/include",
+        "%package(@@__REPOSITORY__//)%/lib/gcc/x86_64-buildroot-linux-gnu/__VERSION__/include-fixed",
+        "%package(@@__REPOSITORY__//)%/x86_64-buildroot-linux-gnu/include",
+        "%package(@@__REPOSITORY__//)%/x86_64-buildroot-linux-gnu/sysroot/usr/include",
+        "%package(@@__REPOSITORY__//)%/x86_64-buildroot-linux-gnu/include/c++/__VERSION__",
+        "%package(@@__REPOSITORY__//)%/x86_64-buildroot-linux-gnu/include/c++/__VERSION__/x86_64-buildroot-linux-gnu",
+        "%package(@@__REPOSITORY__//)%/x86_64-buildroot-linux-gnu/include/c++/__VERSION__/backward",
     ],
     cxx_flags = [],  # REPLACE
     dbg_compile_flags = [],  # REPLACE
@@ -90,7 +90,7 @@ cc_toolchain_config(
         "objdump": "bin/x86_64-linux-objdump",
         "strip": "bin/x86_64-linux-strip",
     },
-    toolchain_identifier = "gcc-@@VARIANT@@",
+    toolchain_identifier = "gcc-__VARIANT__",
     unfiltered_compile_flags = [
         "-fno-canonical-system-headers",
         "-no-canonical-prefixes",
