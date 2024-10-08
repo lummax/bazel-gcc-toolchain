@@ -1,116 +1,80 @@
-load("@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl", "cc_toolchain_config")
-load("@@rules_cc//cc:defs.bzl", "cc_toolchain", "cc_toolchain_suite")
-
-package(default_visibility = ["//visibility:public"])
-
-cc_library(name = "empty_lib")
-
-filegroup(
-    name = "empty",
-    srcs = [],
-)
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
+load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
+load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
 
 filegroup(
     name = "compiler_deps",
-    srcs = glob(["**/*"]),
+    srcs = glob(
+        ["**/*"],
+        exclude = ["BUILD.bazel"],
+    ),
 )
 
-cc_toolchain(
-    name = "cc_toolchain",
-    all_files = ":compiler_deps",
-    ar_files = ":compiler_deps",
-    as_files = ":compiler_deps",
-    compiler_files = ":compiler_deps",
-    dwp_files = ":empty",
-    linker_files = ":compiler_deps",
-    module_map = None,
-    objcopy_files = ":empty",
-    strip_files = ":empty",
-    supports_header_parsing = 1,
-    supports_param_files = 1,
-    toolchain_config = "gcc-__VARIANT__-config",
-    toolchain_identifier = "gcc-__VARIANT__",
+directory(
+    name = "root",
+    srcs = [":compiler_deps"],
 )
 
-cc_toolchain_config(
-    name = "gcc-__VARIANT__-config",
-    abi_libc_version = "local",
-    abi_version = "local",
-    builtin_sysroot = "external/__REPOSITORY__/x86_64-unknown-linux-gnu/sysroot",
-    compile_flags = [],  # REPLACE
-    compiler = "gcc",
-    conly_flags = [],
-    coverage_compile_flags = ["--coverage"],
-    coverage_link_flags = ["--coverage"],
-    cpu = "__ARCH__",
-    cxx_builtin_include_directories = [
-        "%package(@@__REPOSITORY__//)%/lib/gcc/x86_64-unknown-linux-gnu/__VERSION__/include",
-        "%package(@@__REPOSITORY__//)%/lib/gcc/x86_64-unknown-linux-gnu/__VERSION__/include-fixed",
-        "%package(@@__REPOSITORY__//)%/x86_64-unknown-linux-gnu/include",
-        "%package(@@__REPOSITORY__//)%/x86_64-unknown-linux-gnu/sysroot/usr/include",
-        "%package(@@__REPOSITORY__//)%/x86_64-unknown-linux-gnu/include/c++/__VERSION__",
-        "%package(@@__REPOSITORY__//)%/x86_64-unknown-linux-gnu/include/c++/__VERSION__/x86_64-unknown-linux-gnu",
-        "%package(@@__REPOSITORY__//)%/x86_64-unknown-linux-gnu/include/c++/__VERSION__/backward",
-    ],
-    cxx_flags = [],  # REPLACE
-    dbg_compile_flags = [],  # REPLACE
-    extra_flags_per_feature = {},
-    host_system_name = "local",
-    link_flags = [
-        "-fuse-ld=gold",
-        "-B/usr/bin",
-        "-Wl,-no-as-needed",
-        "-Wl,-z,relro,-z,now",
-        "-pass-exit-codes",
-    ],
-    link_libs = [
-        "-Wl,--push-state,-as-needed",
-        "-lstdc++",
-        "-Wl,--pop-state",
-        "-Wl,--push-state,-as-needed",
-        "-lm",
-        "-Wl,--pop-state",
-    ],
-    opt_compile_flags = [],  # REPLACE
-    opt_link_flags = ["-Wl,--gc-sections"],
-    supports_start_end_lib = True,
-    target_libc = "local",
-    target_system_name = "x86_64-linux",
-    tool_paths = {
-        "ar": "bin/x86_64-unknown-linux-gnu-ar",
-        "ld": "bin/x86_64-unknown-linux-gnu-ld",
-        "llvm-cov": "None",
-        "llvm-profdata": "None",
-        "cpp": "bin/x86_64-unknown-linux-gnu-cpp",
-        "gcc": "bin/x86_64-unknown-linux-gnu-gcc",
-        "dwp": "bin/x86_64-unknown-linux-gnu-dwp",
-        "gcov": "bin/x86_64-unknown-linux-gnu-gcov",
-        "nm": "bin/x86_64-unknown-linux-gnu-nm",
-        "objcopy": "bin/x86_64-unknown-linux-gnu-objcopy",
-        "objdump": "bin/x86_64-unknown-linux-gnu-objdump",
-        "strip": "bin/x86_64-unknown-linux-gnu-strip",
+subdirectory(
+    name = "sysroot",
+    parent = ":root",
+    path = "x86_64-unknown-linux-gnu/sysroot",
+    visibility = ["//visibility:public"],
+)
+
+cc_tool(
+    name = "ar",
+    src = "bin/x86_64-unknown-linux-gnu-ar",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "asm",
+    src = "bin/x86_64-unknown-linux-gnu-as",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "g++",
+    src = "bin/x86_64-unknown-linux-gnu-g++",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "gcc",
+    src = "bin/x86_64-unknown-linux-gnu-gcc",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "ldd",
+    src = "bin/x86_64-unknown-linux-gnu-g++",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "objcopy",
+    src = "bin/x86_64-unknown-linux-gnu-objcopy",
+    data = [":compiler_deps"],
+)
+
+cc_tool(
+    name = "strip",
+    src = "bin/x86_64-unknown-linux-gnu-strip",
+    data = [":compiler_deps"],
+)
+
+cc_tool_map(
+    name = "tool_map",
+    tools = {
+        "@rules_cc//cc/toolchains/actions:ar_actions": ":ar",
+        "@rules_cc//cc/toolchains/actions:assembly_actions": ":asm",
+        "@rules_cc//cc/toolchains/actions:c_compile": ":gcc",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions": ":g++",
+        "@rules_cc//cc/toolchains/actions:link_actions": ":ldd",
+        "@rules_cc//cc/toolchains/actions:objcopy_embed_data": ":objcopy",
+        "@rules_cc//cc/toolchains/actions:strip": ":strip",
     },
-    toolchain_identifier = "gcc-__VARIANT__",
-    unfiltered_compile_flags = [
-        "-fno-canonical-system-headers",
-        "-no-canonical-prefixes",
-        "-Wno-builtin-macro-redefined",
-        "-D__DATE__=\"redacted\"",
-        "-D__TIMESTAMP__=\"redacted\"",
-        "-D__TIME__=\"redacted\"",
-    ],
-)
-
-toolchain(
-    name = "gcc_toolchain",
-    exec_compatible_with = [
-        "@@platforms//os:linux",
-        "@@platforms//cpu:__ARCH__",
-    ],
-    target_compatible_with = [
-        "@@platforms//os:linux",
-        "@@platforms//cpu:__ARCH__",
-    ],
-    toolchain = ":cc_toolchain",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+    visibility = ["//visibility:public"],
 )

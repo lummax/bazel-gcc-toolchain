@@ -1,0 +1,98 @@
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
+load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
+load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
+
+cc_sysroot(
+    name = "sysroot",
+    sysroot = "@crosstoolNG_gcc//:sysroot",
+)
+
+cc_args(
+    name = "no_canonical_prefixes",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:c_compile",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
+    ],
+    args = [
+        "-fno-canonical-system-headers",
+        "-no-canonical-prefixes",
+    ],
+)
+
+cc_args(
+    name = "hardening",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:c_compile",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
+    ],
+    args = [
+        "-U_FORTIFY_SOURCE",
+        "-fstack-protector",
+        "-Wall",
+        "-Wunused-but-set-parameter",
+        "-Wno-free-nonheap-object",
+        "-fno-omit-frame-pointer",
+    ],
+)
+
+cc_args(
+    name = "determinism",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:c_compile",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
+    ],
+    args = [
+        "-Wno-builtin-macro-redefined",
+        '-D__DATE__"redacted"',
+        '-D__TIMESTAMP__"redacted"',
+        '-D__TIME__"redacted"',
+    ],
+)
+
+cc_args(
+    name = "dbg_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = ["-g3"],
+)
+
+cc_feature(
+    name = "override_dbg",
+    args = [":dbg_args"],
+    overrides = "@rules_cc//cc/toolchains/features:dbg",
+)
+
+cc_toolchain(
+    name = "cc_toolchain",
+    args = [
+        ":sysroot",
+        ":hardening",
+        ":determinism",
+        ":no_canonical_prefixes",
+    ],
+    enabled_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+    ],
+    known_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        ":override_dbg",
+    ],
+    tool_map = "@crosstoolNG_gcc//:tool_map",
+)
+
+toolchain(
+    name = "gcc_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":cc_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)

@@ -3,6 +3,16 @@ bazel_dep(
     version = "7.3.1",
     dev_dependency = True,
 )
+bazel_dep(
+    name = "bazel_skylib",
+    version = "1.7.1",
+    dev_dependency = True,
+)
+bazel_dep(
+    name = "rules_cc",
+    version = "0.0.12",
+    dev_dependency = True,
+)
 
 bootlin_toolchains = use_extension(
     "//toolchain/bootlin_gcc:extension.bzl",
@@ -14,6 +24,20 @@ bootlin_toolchains.configure(
 )
 use_repo(bootlin_toolchains, "gcc_toolchain")
 
+#http_archive = use_repo_rule(
+#    "@bazel_tools//tools/build_defs/repo:http.bzl",
+#    "http_archive",
+#)
+#
+#http_archive(
+#    name = "crosstoolNG_gcc",
+#    build_file = "//toolchain/crosstoolNG_gcc:BUILD.tmpl.bazel",
+#    sha256 = "...",
+#    strip_prefix = "x86_64-unknown-linux-gnu",
+#    url = "http://.../x86_64-unknown-linux-gnu.tar.bz2",
+#)
+
 register_toolchains(
     "@gcc_toolchain//:gcc_13.3.0_toolchain",
+    #"//toolchain/crosstoolNG_gcc:gcc_toolchain",
 )
